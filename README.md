@@ -1,89 +1,127 @@
-# ccSwitchboard Mac
+# ccSwitch
 
-`ccSwitchboard Mac` 是一个本地 macOS 菜单栏应用，用来管理和切换多个 Codex / ChatGPT 账号。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Swift 6.0+](https://img.shields.io/badge/Swift-6.0%2B-orange)
+![macOS 13.0+](https://img.shields.io/badge/macOS-13.0%2B-blue)
+[![Latest Release](https://img.shields.io/github/v/release/eiis/ccSwitch)](https://github.com/eiis/ccSwitch/releases)
+[![Downloads](https://img.shields.io/github/downloads/eiis/ccSwitch/total)](https://github.com/eiis/ccSwitch/releases)
 
-它直接读写本机的 `~/.codex/auth.json`，不会依赖云端同步，也不会把账号信息上传到第三方服务。
+Lightweight macOS menu bar account switcher for Codex / ChatGPT, with local auth management and usage-aware switching.
 
-## 功能
+[中文](README.zh.md) · [Download](https://github.com/eiis/ccSwitch/releases) · [Feedback](https://github.com/eiis/ccSwitch/issues)
 
-- 导入当前本机 `Codex` 登录态
-- 通过 OpenAI 登录新增账号
-- 保存多个账号并一键切换
-- 查看账号 5 小时 / 7 天额度使用情况
-- 当前账号额度耗尽时自动切换到下一个可用账号
-- 手动切换前先校验额度，避免切到已耗尽账号
-- 菜单栏和管理窗口都能快速查看账号状态
+* * *
 
-## 运行要求
+## ✨ Features
 
-- macOS 13 或更高
-- 本机已安装 `Codex`，并存在 `~/.codex/auth.json`
-- 构建环境需要 Xcode Command Line Tools 或完整 Xcode
+- Multi-account switching — Save multiple Codex / ChatGPT accounts locally and switch with one click
+- Usage visibility — Inspect 5-hour and 7-day usage windows for each account
+- Auto fallback — Automatically switches away from the current account when usage is exhausted
+- Safe manual switching — Pre-checks target account usage before applying the switch
+- Local-first — Reads and writes `~/.codex/auth.json` directly, with no third-party sync
+- Menu bar workflow — Fast access from the menu bar, plus a larger account management window
 
-## 本地开发
+* * *
+
+## Installation
+
+### Direct Download
+
+Download the latest `ccSwitch-macos-unsigned.zip` from the [Releases](https://github.com/eiis/ccSwitch/releases) page, unzip it, and move `ccSwitch.app` to your `/Applications` folder.
+
+Because this build is distributed without an Apple Developer account:
+
+- it is ad-hoc signed
+- it is not notarized
+- macOS may warn on first launch
+
+If macOS blocks the app, right-click `ccSwitch.app` and choose `Open`.
+
+If Gatekeeper quarantine still prevents launch, run:
 
 ```bash
+xattr -dr com.apple.quarantine /Applications/ccSwitch.app
+```
+
+### Build from Source
+
+```bash
+git clone https://github.com/eiis/ccSwitch.git
+cd ccSwitch
 swift build
 swift run ccSwitchboardMac
 ```
 
-## Release 打包
+> Requirements: macOS 13.0 or later. Xcode Command Line Tools or full Xcode is required only for building from source.
 
-仓库提供了一个无开发者账号也能用的打包脚本：
+* * *
+
+## Usage
+
+- Import Current Auth: import the account currently stored in `~/.codex/auth.json`
+- Add OpenAI Account: add another account through browser-based OpenAI login
+- Set Active: switch the local Codex auth to the selected saved account
+- Refresh: update all account usage information immediately
+
+Manual switching behavior:
+
+- The app refreshes the target account usage before switching
+- If the target account is already exhausted, the switch is blocked
+- If the active account later becomes exhausted and another usable account exists, the app can auto-switch
+
+* * *
+
+## How It Works
+
+`ccSwitch` stores imported account metadata locally, then swaps the active account by rewriting `~/.codex/auth.json`. Usage information is fetched from the ChatGPT usage API using each account's local auth token and account ID.
+
+The app does not proxy requests, host credentials remotely, or modify Codex itself. It only manages local auth state on your Mac.
+
+* * *
+
+## Project Structure
+
+```text
+Sources/ccSwitchboardMac/
+├── App/                         # App lifecycle and state management
+├── Core/
+│   ├── Auth/                    # auth.json parsing, normalization, OAuth login
+│   ├── Storage/                 # local account persistence
+│   └── Usage/                   # usage API fetching and interpretation
+├── Features/
+│   ├── Accounts/                # account manager window UI
+│   └── MenuBar/                 # menu bar dropdown UI
+└── Shared/                      # shared models, badges, icon rendering
+
+scripts/package_release.sh       # builds release .app bundle and zip
+```
+
+* * *
+
+## Packaging
+
+To build a distributable release bundle locally:
 
 ```bash
 ./scripts/package_release.sh
 ```
 
-执行后会生成：
+Output:
 
-- `dist/ccSwitchboardMac.app`
-- `dist/ccSwitchboardMac-macos-unsigned.zip`
+- `dist/ccSwitch.app`
+- `dist/ccSwitch-macos-unsigned.zip`
 
-## 用户如何直接使用
+* * *
 
-因为没有 Apple Developer 账号，这个 release 包是：
+## Limitations
 
-- 未上架
-- 未 notarize
-- 使用 ad-hoc 签名
+- The app controls local `auth.json`; it does not guarantee a running Codex process will reload credentials immediately
+- Automatic switching depends on the latest fetched usage data
+- Without notarization, first-launch friction on macOS is expected
 
-这意味着用户下载后第一次打开时，macOS 可能提示“无法验证开发者”。
+* * *
 
-可用方式：
+## License
 
-1. 把 `ccSwitchboardMac.app` 拖到 `Applications`
-2. 右键应用，选择“打开”
-3. 再次确认打开
-
-如果系统仍然拦截，可以执行：
-
-```bash
-xattr -dr com.apple.quarantine /Applications/ccSwitchboardMac.app
-```
-
-## 账号与数据存储
-
-- 本地账号列表保存在应用自己的本地存储文件中
-- 当前激活账号通过覆盖 `~/.codex/auth.json` 实现
-- 应用不会替你托管账号，也不会替你同步到别的机器
-
-## 当前已实现的额度切换逻辑
-
-- 应用启动后会自动刷新所有账号 usage
-- 后台会周期性静默刷新 usage
-- 手动切换账号前会先检查目标账号 usage
-- 如果当前账号额度耗尽，并且存在其他可用账号，会自动切换
-
-## 限制说明
-
-- 它控制的是本机 `auth.json`
-- 如果某个正在运行的 Codex 进程已经缓存了旧凭证，是否立刻生效取决于 Codex 本身的实现
-- 未 notarize 的 macOS 应用首次打开体验不如正式签名应用
-
-## 目录说明
-
-- `Sources/ccSwitchboardMac`：应用源码
-- `scripts/package_release.sh`：构建并打包 release
-- `dist/`：输出目录
+[MIT](LICENSE) © 2026 eiis
 

@@ -4,14 +4,15 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 APP_NAME="ccSwitchboardMac"
+PRODUCT_NAME="ccSwitch"
 BUILD_DIR="$ROOT_DIR/.build"
 DIST_DIR="$ROOT_DIR/dist"
-APP_DIR="$DIST_DIR/$APP_NAME.app"
+APP_DIR="$DIST_DIR/$PRODUCT_NAME.app"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
 EXECUTABLE_PATH="$BUILD_DIR/arm64-apple-macosx/release/$APP_NAME"
-ZIP_PATH="$DIST_DIR/${APP_NAME}-macos-unsigned.zip"
+ZIP_PATH="$DIST_DIR/${PRODUCT_NAME}-macos-unsigned.zip"
 
 rm -rf "$APP_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
@@ -29,15 +30,15 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
     <key>CFBundleDevelopmentRegion</key>
     <string>zh_CN</string>
     <key>CFBundleDisplayName</key>
-    <string>ccSwitchboardMac</string>
+    <string>ccSwitch</string>
     <key>CFBundleExecutable</key>
     <string>ccSwitchboardMac</string>
     <key>CFBundleIdentifier</key>
-    <string>local.ccswitchboard.mac</string>
+    <string>com.eiis.ccswitch</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>ccSwitchboardMac</string>
+    <string>ccSwitch</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
