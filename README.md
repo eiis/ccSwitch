@@ -12,6 +12,14 @@ Lightweight macOS menu bar account switcher for Codex / ChatGPT, with local auth
 
 * * *
 
+## Screenshots
+
+| Menu Bar | Account Manager |
+|:---:|:---:|
+| <img src="screenshots/menubar.png" width="320" /> | <img src="screenshots/accounts.png" width="480" /> |
+
+* * *
+
 ## ✨ Features
 
 - Multi-account switching — Save multiple Codex / ChatGPT accounts locally and switch with one click

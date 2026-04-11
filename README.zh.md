@@ -12,6 +12,14 @@
 
 * * *
 
+## 截图
+
+| 菜单栏 | 账号管理 |
+|:---:|:---:|
+| <img src="screenshots/menubar.png" width="320" /> | <img src="screenshots/accounts.png" width="480" /> |
+
+* * *
+
 ## ✨ 功能
 
 - 多账号切换：本地保存多个 Codex / ChatGPT 账号并一键切换
