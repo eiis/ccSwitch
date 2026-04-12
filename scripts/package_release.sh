@@ -12,7 +12,7 @@ CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
 EXECUTABLE_PATH="$BUILD_DIR/arm64-apple-macosx/release/$APP_NAME"
-ZIP_PATH="$DIST_DIR/${PRODUCT_NAME}-macos-unsigned.zip"
+DMG_PATH="$DIST_DIR/${PRODUCT_NAME}-macos-unsigned.dmg"
 
 rm -rf "$APP_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
@@ -64,8 +64,21 @@ PLIST
 
 codesign --force --deep -s - "$APP_DIR"
 
-rm -f "$ZIP_PATH"
-ditto -c -k --sequesterRsrc --keepParent "$APP_DIR" "$ZIP_PATH"
+rm -f "$DMG_PATH"
+
+# Create DMG with Applications symlink for drag-to-install
+DMG_STAGING="$DIST_DIR/dmg_staging"
+rm -rf "$DMG_STAGING"
+mkdir -p "$DMG_STAGING"
+cp -R "$APP_DIR" "$DMG_STAGING/"
+ln -s /Applications "$DMG_STAGING/Applications"
+
+hdiutil create -volname "$PRODUCT_NAME" \
+    -srcfolder "$DMG_STAGING" \
+    -ov -format UDZO \
+    "$DMG_PATH"
+
+rm -rf "$DMG_STAGING"
 
 echo "App bundle: $APP_DIR"
-echo "Zip package: $ZIP_PATH"
+echo "DMG package: $DMG_PATH"
