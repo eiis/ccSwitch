@@ -20,6 +20,11 @@ mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 swift build -c release
 
 cp "$EXECUTABLE_PATH" "$MACOS_DIR/$APP_NAME"
+
+# Generate app icon
+swift "$ROOT_DIR/scripts/generate_icon.swift" "$RESOURCES_DIR"
+iconutil --convert icns --output "$RESOURCES_DIR/AppIcon.icns" "$RESOURCES_DIR/AppIcon.iconset"
+rm -rf "$RESOURCES_DIR/AppIcon.iconset"
 chmod +x "$MACOS_DIR/$APP_NAME"
 
 cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
@@ -37,6 +42,8 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
     <string>com.eiis.ccswitch</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleName</key>
     <string>ccSwitch</string>
     <key>CFBundlePackageType</key>
