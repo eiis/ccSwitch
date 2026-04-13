@@ -16,8 +16,10 @@ struct ccSwitchboardMacApp: App {
                     appState.bootstrap()
                 }
         } label: {
-            Image(systemName: "arrow.left.arrow.right.circle")
-                .accessibilityLabel("ccSwitchboard")
+            MenuBarIconView(appState: appState)
+                .onAppear {
+                    appState.bootstrap()
+                }
         }
         .menuBarExtraStyle(.window)
 

@@ -18,12 +18,18 @@
 |:---:|:---:|
 | <img src="screenshots/menubar.png" width="320" /> | <img src="screenshots/accounts.png" width="480" /> |
 
+### 菜单栏实时额度显示
+
+<img src="screenshots/menubar.png" width="642" />
+
 * * *
 
 ## ✨ 功能
 
 - 多账号切换：本地保存多个 Codex / ChatGPT 账号并一键切换
-- 额度可视化：查看每个账号的 5 小时和 7 天 usage
+- 额度可视化：查看每个账号的 5 小时和 7 天 usage，并显示 reset time
+- 菜单栏实时状态：在顶部菜单栏直接显示当前账号的 usage 圆环和数字状态
+- 更简洁的账号管理界面：用更清晰的布局集中展示账号身份、usage 进度、reset time 和操作按钮
 - 自动兜底：当前账号额度耗尽时自动切到下一个可用账号
 - 安全手动切换：切换前先校验目标账号 usage，避免切到已耗尽账号
 - 本地优先：直接读写 `~/.codex/auth.json`，不依赖第三方同步
@@ -35,7 +41,7 @@
 
 ### 直接下载
 
-从 [Releases](https://github.com/eiis/ccSwitch/releases) 页面下载最新的 `ccSwitch-macos-unsigned.zip`，解压后将 `ccSwitch.app` 拖到 `/Applications`。
+从 [Releases](https://github.com/eiis/ccSwitch/releases) 页面下载最新的 `ccSwitch-macos-unsigned.dmg`，打开后将 `ccSwitch.app` 拖到 `/Applications`。
 
 由于当前没有 Apple Developer 账号，这个安装包：
 
@@ -101,7 +107,7 @@ Sources/ccSwitchboardMac/
 │   └── MenuBar/                 # 菜单栏下拉 UI
 └── Shared/                      # 共享模型、套餐徽章、图标绘制
 
-scripts/package_release.sh       # 构建 release .app 与 zip
+scripts/package_release.sh       # 构建 release .app 与 dmg
 ```
 
 * * *
@@ -119,7 +125,7 @@ scripts/package_release.sh       # 构建 release .app 与 zip
 输出：
 
 - `dist/ccSwitch.app`
-- `dist/ccSwitch-macos-unsigned.zip`
+- `dist/ccSwitch-macos-unsigned.dmg`
 
 * * *
 
