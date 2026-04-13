@@ -114,6 +114,8 @@ scripts/package_release.sh       # 构建 release .app 与 zip
 ./scripts/package_release.sh
 ```
 
+这个打包过程也会重新生成 app iconset 和 `AppIcon.icns`，确保最终分发包使用当前这版更接近 macOS 应用图标规格的图标资源。
+
 输出：
 
 - `dist/ccSwitch.app`
@@ -132,4 +134,3 @@ scripts/package_release.sh       # 构建 release .app 与 zip
 ## 许可证
 
 [MIT](LICENSE) © 2026 eiis
-

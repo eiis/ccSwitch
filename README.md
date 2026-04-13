@@ -114,6 +114,8 @@ To build a distributable release bundle locally:
 ./scripts/package_release.sh
 ```
 
+This packaging step also regenerates the app icon set and `AppIcon.icns`, so the shipped bundle uses the current macOS-style app tile proportions.
+
 Output:
 
 - `dist/ccSwitch.app`
@@ -132,4 +134,3 @@ Output:
 ## License
 
 [MIT](LICENSE) © 2026 eiis
-
