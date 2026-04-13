@@ -11,7 +11,7 @@ struct AccountRowView: View {
                     percent: account.usage?.fiveHour?.usedPercent,
                     accent: isCurrent ? .blue : .teal,
                     title: "5h",
-                    subtitle: account.usage?.fiveHour == nil ? "N/A" : "Short",
+                    subtitle: shortResetText(account.usage?.fiveHour?.resetAt),
                     size: 42,
                     lineWidth: 6
                 )
@@ -20,28 +20,16 @@ struct AccountRowView: View {
                     percent: account.usage?.oneWeek?.usedPercent,
                     accent: .orange,
                     title: "7d",
-                    subtitle: account.usage?.oneWeek == nil ? "N/A" : "Week",
+                    subtitle: weekResetText(account.usage?.oneWeek?.resetAt),
                     size: 42,
                     lineWidth: 6
                 )
             }
 
             VStack(alignment: .leading, spacing: 5) {
-                HStack(spacing: 6) {
-                    Text(account.email ?? account.label)
-                        .font(.system(size: 13, weight: .semibold))
-                        .lineLimit(1)
-
-                    if isCurrent {
-                        Text("ACTIVE")
-                            .font(.system(size: 9, weight: .bold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 3)
-                            .background(Color.blue.opacity(0.12))
-                            .foregroundStyle(.blue)
-                            .clipShape(Capsule())
-                    }
-                }
+                Text(account.email ?? account.label)
+                    .font(.system(size: 13, weight: .semibold))
+                    .lineLimit(1)
 
                 if let planType = account.planType, !planType.isEmpty {
                     PlanBadge(planType: planType)
@@ -59,5 +47,21 @@ struct AccountRowView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(isCurrent ? Color.blue.opacity(0.22) : Color.primary.opacity(0.06), lineWidth: 1)
         )
+    }
+
+    private func shortResetText(_ date: Date?) -> String {
+        guard let date else { return "N/A" }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private func weekResetText(_ date: Date?) -> String {
+        guard let date else { return "N/A" }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "MM-dd HH:mm"
+        return formatter.string(from: date)
     }
 }

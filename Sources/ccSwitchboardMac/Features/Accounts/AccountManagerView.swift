@@ -40,51 +40,53 @@ struct AccountManagerView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("ccSwitchboard")
-                .font(.system(size: 28, weight: .bold))
-            Text("Switch local Codex accounts from a menu bar app, with local storage and direct auth.json control.")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.secondary)
-
-            HStack(spacing: 14) {
-                StatTile(title: "Accounts", value: "\(appState.accounts.count)", accent: .blue)
-                StatTile(title: "Active", value: appState.currentAccount?.email ?? "None", accent: .teal)
-                StatTile(title: "Auth Path", value: appState.authFileName, accent: .orange)
+        HStack(alignment: .center, spacing: 16) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Accounts")
+                    .font(.system(size: 26, weight: .bold))
+                Text("\(appState.accounts.count) saved • \(appState.currentAccount?.email ?? "No active account")")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
 
-            Text(appState.authFilePath)
-                .font(.system(size: 12, weight: .medium))
+            Spacer()
+
+            Text(appState.authFileName)
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.secondary)
-                .textSelection(.enabled)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(Color.primary.opacity(0.05))
+                .clipShape(Capsule())
         }
-        .padding(18)
+        .padding(16)
         .background(
             LinearGradient(
-                colors: [Color.blue.opacity(0.18), Color.teal.opacity(0.12), Color.white.opacity(0.15)],
+                colors: [Color.blue.opacity(0.14), Color.teal.opacity(0.08), Color.white.opacity(0.10)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.white.opacity(0.22), lineWidth: 1)
         )
     }
 
     private var actionBar: some View {
-        HStack(spacing: 10) {
-            ActionButton(title: "Add OpenAI Account", systemImage: "person.crop.circle.badge.plus", tint: .pink) {
+        HStack(spacing: 8) {
+            ActionButton(title: "Add Account", systemImage: "person.crop.circle.badge.plus", tint: .pink) {
                 isOAuthGuidePresented = true
             }
             .disabled(appState.isBusy)
 
-            ActionButton(title: "Import Current Auth", systemImage: "square.and.arrow.down.fill", tint: .blue) {
+            ActionButton(title: "Import Current", systemImage: "square.and.arrow.down.fill", tint: .blue) {
                 appState.importCurrentAuth()
             }
 
-            ActionButton(title: "Import JSON File", systemImage: "doc.badge.plus", tint: .teal) {
+            ActionButton(title: "Import JSON", systemImage: "doc.badge.plus", tint: .teal) {
                 isImporterPresented = true
             }
 
@@ -93,22 +95,17 @@ struct AccountManagerView: View {
                 appState.refreshAllUsage()
             }
 
-
             Spacer()
 
             if let current = appState.currentAccount {
-                Label(current.email ?? current.label, systemImage: "sparkles")
-                    .font(.system(size: 12, weight: .bold))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 9)
+                Text(current.email ?? current.label)
+                    .font(.system(size: 12, weight: .semibold))
+                    .padding(.horizontal, 11)
+                    .padding(.vertical, 8)
                     .background(Color.blue.opacity(0.08))
                     .foregroundStyle(.blue)
                     .clipShape(Capsule())
                     .lineLimit(1)
-            } else {
-                Text("No active account")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
             }
         }
         .sheet(isPresented: $isOAuthGuidePresented) {
@@ -174,75 +171,82 @@ private struct EditableAccountRow: View {
     let onDelete: () -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: 16) {
-            VStack(spacing: 10) {
-                UsageRingView(
-                    percent: account.usage?.fiveHour?.usedPercent,
-                    accent: isCurrent ? .blue : .teal,
-                    title: "5h",
-                    subtitle: account.usage?.fiveHour == nil ? "No data" : "Short window",
-                    size: 58,
-                    lineWidth: 8
-                )
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .center, spacing: 14) {
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .stroke(isCurrent ? Color.blue.opacity(0.9) : Color.white.opacity(0.45), lineWidth: 2)
+                    .frame(width: 30, height: 30)
 
-                UsageRingView(
-                    percent: account.usage?.oneWeek?.usedPercent,
-                    accent: .orange,
-                    title: "7d",
-                    subtitle: account.usage?.oneWeek == nil ? "No data" : "Weekly window",
-                    size: 58,
-                    lineWidth: 8
-                )
+                Text(account.email ?? "Unknown email")
+                    .font(.system(size: 16, weight: .bold))
+                    .lineLimit(1)
+
+                Spacer()
+
+                if let planType = account.planType, !planType.isEmpty {
+                    PlanBadge(planType: planType)
+                }
             }
-            .padding(.top, 2)
 
-            VStack(alignment: .leading, spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
-                        Text(account.email ?? "Unknown email")
-                            .font(.system(size: 15, weight: .bold))
-                        if isCurrent {
-                            Text("ACTIVE")
-                                .font(.system(size: 10, weight: .bold))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.blue.opacity(0.12))
-                                .foregroundStyle(.blue)
-                                .clipShape(Capsule())
-                        }
-                    }
-
-                    HStack(spacing: 8) {
-                        if let planType = account.planType, !planType.isEmpty {
-                            PlanBadge(planType: planType)
-                        }
-                    }
+            VStack(alignment: .leading, spacing: 8) {
+                if let accountId = primaryIdentity {
+                    metaLine("User ID", value: accountId)
                 }
 
-                HStack(spacing: 8) {
-                    Button(isCurrent ? "Current" : "Set Active") {
-                        onSwitch()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(isCurrent ? .gray : .teal)
-                    .disabled(isCurrent)
-
-                    Button("Delete", role: .destructive) {
-                        onDelete()
-                    }
-                    .buttonStyle(.bordered)
-
-                    usageSummaryPills
+                if let authMode = authModeText {
+                    metaLine("Sign-in", value: authMode)
                 }
+            }
+
+            UsageBarRow(
+                title: "5h",
+                icon: "clock",
+                percent: account.usage?.fiveHour?.usedPercent,
+                accent: isCurrent ? .blue : .teal,
+                detail: countdownText(until: account.usage?.fiveHour?.resetAt, includeDate: false)
+            )
+
+            UsageBarRow(
+                title: "Weekly",
+                icon: "calendar",
+                percent: account.usage?.oneWeek?.usedPercent,
+                accent: .orange,
+                detail: countdownText(until: account.usage?.oneWeek?.resetAt, includeDate: true)
+            )
+
+            Divider()
+
+            HStack(spacing: 10) {
+                Text(account.updatedAt.formatted(date: .numeric, time: .shortened))
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(Color.primary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                Spacer()
+
+                Button(isCurrent ? "Current" : "Set Active") {
+                    onSwitch()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(isCurrent ? .gray : .teal)
+                .disabled(isCurrent)
+
+                Button("Delete", role: .destructive) {
+                    onDelete()
+                }
+                .buttonStyle(.bordered)
             }
         }
-        .padding(16)
+        .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
                 colors: [
-                    isCurrent ? Color.blue.opacity(0.10) : Color.white.opacity(0.72),
-                    isCurrent ? Color.teal.opacity(0.06) : Color.primary.opacity(0.03)
+                    Color(red: 0.06, green: 0.11, blue: 0.22).opacity(isCurrent ? 0.98 : 0.94),
+                    Color(red: 0.05, green: 0.09, blue: 0.18).opacity(isCurrent ? 0.96 : 0.90)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -255,56 +259,106 @@ private struct EditableAccountRow: View {
         )
     }
 
+    private var primaryIdentity: String? {
+        account.principalId ?? account.chatGPTAccountId ?? normalized(account.accountId)
+    }
+
+    private var authModeText: String? {
+        if account.auth["refresh_token"]?.stringValue?.isEmpty == false {
+            return "OpenAI OAuth"
+        }
+        if account.auth["id_token"]?.stringValue?.isEmpty == false {
+            return "Local auth.json"
+        }
+        return nil
+    }
+
     @ViewBuilder
-    private var usageSummaryPills: some View {
-        if let fiveHour = account.usage?.fiveHour?.usedPercent {
-            Text("5h \(fiveHour.formatted(.number.precision(.fractionLength(0))))%")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 6)
-                .background(Color.primary.opacity(0.05))
-                .clipShape(Capsule())
+    private func metaLine(_ title: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Text("\(title):")
+            Text(value)
+                .lineLimit(1)
+        }
+        .font(.system(size: 12, weight: .medium))
+        .foregroundStyle(.secondary)
+    }
+
+    private func countdownText(until date: Date?, includeDate: Bool) -> String {
+        guard let date else { return "N/A" }
+        let remaining = max(Int(date.timeIntervalSinceNow), 0)
+        let days = remaining / 86_400
+        let hours = (remaining % 86_400) / 3_600
+        let minutes = (remaining % 3_600) / 60
+
+        let countdown: String
+        if days > 0 {
+            countdown = "\(days)d \(hours)h \(minutes)m"
+        } else if hours > 0 {
+            countdown = "\(hours)h \(minutes)m"
+        } else {
+            countdown = "\(minutes)m"
         }
 
-        if let oneWeek = account.usage?.oneWeek?.usedPercent {
-            Text("7d \(oneWeek.formatted(.number.precision(.fractionLength(0))))%")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 6)
-                .background(Color.primary.opacity(0.05))
-                .clipShape(Capsule())
-        } else if let credits = account.usage?.credits {
-            Text(credits.unlimited ? "Unlimited" : (credits.balance ?? "Credits"))
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 6)
-                .background(Color.primary.opacity(0.05))
-                .clipShape(Capsule())
-        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = includeDate ? "MM/dd HH:mm" : "HH:mm"
+        return "\(countdown)  (\(formatter.string(from: date)))"
+    }
+
+    private func normalized(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 }
 
-private struct StatTile: View {
+private struct UsageBarRow: View {
     let title: String
-    let value: String
+    let icon: String
+    let percent: Double?
     let accent: Color
+    let detail: String
+
+    private var clampedPercent: Double {
+        min(max(percent ?? 0, 0), 100)
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title.uppercased())
-                .font(.system(size: 10, weight: .bold))
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.system(size: 14, weight: .bold))
-                .lineLimit(1)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label(title, systemImage: icon)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(percent.map { "\($0.formatted(.number.precision(.fractionLength(0))))%" } ?? "N/A")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(accent)
+            }
+
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(accent.opacity(0.16))
+                        .frame(height: 12)
+
+                    Capsule()
+                        .fill(accent)
+                        .frame(width: max(14, proxy.size.width * CGFloat(clampedPercent / 100)), height: 12)
+                }
+            }
+            .frame(height: 12)
+
+            HStack {
+                Spacer()
+
+                Text(detail)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(accent.opacity(0.10))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
 
@@ -320,12 +374,12 @@ private struct ActionButton: View {
                 Image(systemName: systemImage)
                 Text(title)
             }
-            .font(.system(size: 12, weight: .bold))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .font(.system(size: 12, weight: .semibold))
+            .padding(.horizontal, 11)
+            .padding(.vertical, 8)
             .background(tint.opacity(0.12))
             .foregroundStyle(tint)
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(.plain)
     }

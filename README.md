@@ -27,7 +27,9 @@ Lightweight macOS menu bar account switcher for Codex / ChatGPT, with local auth
 ## ✨ Features
 
 - Multi-account switching — Save multiple Codex / ChatGPT accounts locally and switch with one click
-- Usage visibility — Inspect 5-hour and 7-day usage windows for each account
+- Usage visibility — Inspect 5-hour and 7-day usage windows for each account, including reset times
+- Live menu bar status — Show the current account's live usage ring and numeric status directly in the menu bar
+- Simplified account manager — Review account identity, usage progress, reset timing, and actions in a cleaner management view
 - Auto fallback — Automatically switches away from the current account when usage is exhausted
 - Safe manual switching — Pre-checks target account usage before applying the switch
 - Local-first — Reads and writes `~/.codex/auth.json` directly, with no third-party sync
@@ -39,7 +41,7 @@ Lightweight macOS menu bar account switcher for Codex / ChatGPT, with local auth
 
 ### Direct Download
 
-Download the latest `ccSwitch-macos-unsigned.zip` from the [Releases](https://github.com/eiis/ccSwitch/releases) page, unzip it, and move `ccSwitch.app` to your `/Applications` folder.
+Download the latest `ccSwitch-macos-unsigned.dmg` from the [Releases](https://github.com/eiis/ccSwitch/releases) page, open it, and drag `ccSwitch.app` into `/Applications`.
 
 Because this build is distributed without an Apple Developer account:
 
@@ -105,7 +107,7 @@ Sources/ccSwitchboardMac/
 │   └── MenuBar/                 # menu bar dropdown UI
 └── Shared/                      # shared models, badges, icon rendering
 
-scripts/package_release.sh       # builds release .app bundle and zip
+scripts/package_release.sh       # builds release .app bundle and dmg
 ```
 
 * * *
@@ -123,7 +125,7 @@ This packaging step also regenerates the app icon set and `AppIcon.icns`, so the
 Output:
 
 - `dist/ccSwitch.app`
-- `dist/ccSwitch-macos-unsigned.zip`
+- `dist/ccSwitch-macos-unsigned.dmg`
 
 * * *
 
