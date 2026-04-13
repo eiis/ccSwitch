@@ -16,11 +16,11 @@
 
 | 菜单栏 | 账号管理 |
 |:---:|:---:|
-| <img src="screenshots/menubar.png" width="320" /> | <img src="screenshots/accounts.png" width="480" /> |
+| <img src="screenshots/menubar-v013.png" width="320" /> | <img src="screenshots/accounts-v013.png" width="480" /> |
 
 ### 菜单栏实时额度显示
 
-<img src="screenshots/menubar.png" width="642" />
+<img src="screenshots/menubar-v013.png" width="642" />
 
 * * *
 
