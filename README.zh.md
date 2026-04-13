@@ -18,6 +18,10 @@
 |:---:|:---:|
 | <img src="screenshots/menubar.png" width="320" /> | <img src="screenshots/accounts.png" width="480" /> |
 
+### 菜单栏实时额度显示
+
+<img src="screenshots/menubar.png" width="642" />
+
 * * *
 
 ## ✨ 功能

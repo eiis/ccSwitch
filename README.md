@@ -18,6 +18,10 @@ Lightweight macOS menu bar account switcher for Codex / ChatGPT, with local auth
 |:---:|:---:|
 | <img src="screenshots/menubar.png" width="320" /> | <img src="screenshots/accounts.png" width="480" /> |
 
+### Live Menu Bar Usage
+
+<img src="screenshots/menubar.png" width="642" />
+
 * * *
 
 ## ✨ Features
