@@ -40,6 +40,8 @@ final class AppState: ObservableObject {
     let accountStore = AccountStore()
     let usageService = UsageService()
     let oauthManager = OAuthManager()
+    let accountSwitchLog = AccountSwitchLog()
+    lazy var tokenUsageStore: TokenUsageStore = TokenUsageStore(switchLog: accountSwitchLog)
 
     var currentAccount: Account? {
         accounts.first(where: { $0.id == currentAccountID })
@@ -67,6 +69,8 @@ final class AppState: ObservableObject {
             startAuthSyncTimer()
             startUsageRefreshTimer()
             refreshAllUsage(silent: true)
+            seedSwitchLogIfNeeded()
+            tokenUsageStore.refresh()
         } catch {
             lastError = error.localizedDescription
             banner = BannerMessage(title: "Failed to load accounts", detail: error.localizedDescription, tone: .error)
@@ -346,6 +350,17 @@ final class AppState: ObservableObject {
         }
     }
 
+    private func seedSwitchLogIfNeeded() {
+        guard accountSwitchLog.load().isEmpty else { return }
+        if let current = currentAccount {
+            accountSwitchLog.append(
+                accountID: current.id,
+                label: current.email ?? current.label,
+                at: Date().addingTimeInterval(-86_400 * 30)
+            )
+        }
+    }
+
     private func startAuthSyncTimer() {
         guard authSyncTimer == nil else { return }
         authSyncTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
@@ -361,6 +376,7 @@ final class AppState: ObservableObject {
         usageRefreshTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.refreshAllUsage(silent: true)
+                self?.tokenUsageStore.refresh()
             }
         }
         usageRefreshTimer?.tolerance = 10
@@ -573,6 +589,8 @@ final class AppState: ObservableObject {
             observedAuthState = .present(account.auth)
             ignoredAuthSignature = nil
             currentAccountID = account.id
+            accountSwitchLog.append(accountID: account.id, label: account.email ?? account.label)
+            tokenUsageStore.refresh()
             lastError = nil
             banner = BannerMessage(title: title, detail: detail, tone: tone)
         } catch {
