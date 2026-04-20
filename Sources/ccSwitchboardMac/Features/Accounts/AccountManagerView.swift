@@ -11,6 +11,8 @@ struct AccountManagerView: View {
             VStack(alignment: .leading, spacing: 18) {
                 header
                 actionBar
+                TokenUsageCard()
+                    .environmentObject(appState)
                 accountList
                 footer
             }
