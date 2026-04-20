@@ -29,9 +29,11 @@ Lightweight macOS menu bar account switcher for Codex / ChatGPT, with local auth
 - Multi-account switching — Save multiple Codex / ChatGPT accounts locally and switch with one click
 - Usage visibility — Inspect 5-hour and 7-day usage windows for each account, including reset times
 - Live menu bar status — Show the current account's live usage ring and numeric status directly in the menu bar
+- Near-limit warning — Turn the menu bar ring red once the active account reaches 90% usage
 - Simplified account manager — Review account identity, usage progress, reset timing, and actions in a cleaner management view
 - Auto fallback — Automatically switches away from the current account when usage is exhausted
 - Safe manual switching — Pre-checks target account usage before applying the switch
+- Sound alerts — Play distinct macOS alert sounds for manual switches, automatic switches, and exhausted-account warnings
 - Local-first — Reads and writes `~/.codex/auth.json` directly, with no third-party sync
 - Menu bar workflow — Fast access from the menu bar, plus a larger account management window
 
@@ -81,7 +83,15 @@ Manual switching behavior:
 
 - The app refreshes the target account usage before switching
 - If the target account is already exhausted, the switch is blocked
+- If the switch succeeds, the app plays a short confirmation sound
 - If the active account later becomes exhausted and another usable account exists, the app can auto-switch
+
+Alert behavior:
+
+- The menu bar ring turns red at 90% usage and stays red while the account remains near its limit
+- A manual switch plays a light confirmation sound
+- An automatic fallback switch plays a stronger warning sound
+- If all saved accounts are exhausted, the app plays an exhausted-account warning sound
 
 * * *
 

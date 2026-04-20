@@ -41,6 +41,7 @@ final class AppState: ObservableObject {
     let usageService = UsageService()
     let oauthManager = OAuthManager()
     let accountSwitchLog = AccountSwitchLog()
+    let alertSoundPlayer = AlertSoundPlayer()
     lazy var tokenUsageStore: TokenUsageStore = TokenUsageStore(switchLog: accountSwitchLog)
 
     var currentAccount: Account? {
@@ -217,6 +218,7 @@ final class AppState: ObservableObject {
                     tone: .success,
                     manageBusyState: false
                 )
+                alertSoundPlayer.play(.manualSwitched)
 
                 refreshAllUsage(silent: true)
             } catch {
@@ -609,6 +611,7 @@ final class AppState: ObservableObject {
                 detail: "The active account is exhausted and no other usable account was found.",
                 tone: .warning
             )
+            alertSoundPlayer.play(.noUsableAccount)
             return
         }
 
@@ -618,6 +621,7 @@ final class AppState: ObservableObject {
             detail: "\(currentAccount.email ?? currentAccount.label) reached its limit, so the app moved to \(replacement.email ?? replacement.label).",
             tone: .warning
         )
+        alertSoundPlayer.play(.autoSwitched)
     }
 
     private func bestAutoSwitchCandidate(excluding accountID: String) -> Account? {
@@ -654,4 +658,5 @@ final class AppState: ObservableObject {
 
         return false
     }
+
 }

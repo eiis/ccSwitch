@@ -3,6 +3,10 @@ import SwiftUI
 
 struct MenuBarIconView: View {
     @ObservedObject var appState: AppState
+    #if DEBUG
+    private let debugMenuBarPercent = ProcessInfo.processInfo.environment["CCSWITCH_DEBUG_MENU_BAR_PERCENT"]
+        .flatMap(Double.init)
+    #endif
 
     fileprivate enum DisplayedUsage {
         case fiveHour(Double)
@@ -17,6 +21,12 @@ struct MenuBarIconView: View {
     }
 
     private var displayedUsage: DisplayedUsage? {
+        #if DEBUG
+        if let debugMenuBarPercent {
+            return .fiveHour(debugMenuBarPercent)
+        }
+        #endif
+
         if let fiveHour = appState.currentAccount?.usage?.fiveHour?.usedPercent {
             return .fiveHour(fiveHour)
         }
@@ -33,13 +43,6 @@ struct MenuBarIconView: View {
         return false
     }
 
-    private var icon: NSImage {
-        MenuBarStatusIconRenderer.makeIcon(
-            usage: displayedUsage,
-            isExhausted: isExhausted
-        )
-    }
-
     var body: some View {
         Image(nsImage: icon)
             .renderingMode(.original)
@@ -47,6 +50,13 @@ struct MenuBarIconView: View {
             .accessibilityLabel(
                 displayedUsage.map { "ccSwitchboard \(Int($0.percent.rounded()))%" } ?? "ccSwitchboard usage unavailable"
             )
+    }
+
+    private var icon: NSImage {
+        MenuBarStatusIconRenderer.makeIcon(
+            usage: displayedUsage,
+            isExhausted: isExhausted
+        )
     }
 }
 
@@ -71,8 +81,9 @@ private enum MenuBarStatusIconRenderer {
 
         let pct = min(max(usage?.percent ?? 0, 0), 100)
         let hasData = usage != nil
+        let isHighUsage = pct >= 90
         let ringColor: NSColor = {
-            if isExhausted {
+            if isExhausted || isHighUsage {
                 return NSColor.systemRed
             }
             switch usage {
